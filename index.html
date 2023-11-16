@@ -146,7 +146,11 @@
             }
 
             function actualizarRonda(rondas) {
-                document.querySelector(`#ronda`).innerText = `Ronda: ${rondas}`
+                document.querySelector(`#ronda`).innerText = `Ronda: ${rondas}`;
+        
+                const botonReset = document.querySelector(`button[type=button]`);
+                botonReset.textContent = "Resetear";
+                botonReset.className = "btn btn-danger";
             }
 
             function actualizarEstado(text) {
@@ -168,6 +172,9 @@
                 actualizarEstado("¡Has perdido!😢 Haz clic en 'Empezar' para jugar de nuevo. 👉");
                 bloquearUsuario();
                 reiniciarEstado(); 
+                const botonEmpezar = document.querySelector(`button[type=button]`);
+                botonEmpezar.textContent = "Empezar";
+                botonEmpezar.className = "btn btn-primary";
             }
 
         </script>
