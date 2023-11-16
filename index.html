@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css">
+        body {
+            background-color: rgba(14, 13, 13, 0.784);
+        }
+        .cuadros {
+            height: 200px;
+            opacity: 0.9;
+            transition: box-shadow 500ms;
+            max-width: 425px;
+        }
+
+        #azul {
+            background-color: blue;
+            border-top-right-radius: 50%;
+            border: 1px solid white;
+        }
+
+        #rojo {
+            background-color: red;
+            border-top-left-radius: 50%;
+            border: 1px solid white;
+        }
+
+        #verde {
+            background-color: green;
+            border-bottom-right-radius: 50%;
+            border: 1px solid white;
+        }
+
+        #amarillo {
+            background-color: yellow;
+            border-bottom-left-radius: 50%;
+            border: 1px solid white;
+        }
+    </style>
+    <title>Simon Dice</title>
+</head>
+
+<body>
+    <h1 class="text-center text-white mb-5">SIMON DICE</h1>
+    <div class="container">
+        <div class="row align-items-start">
+            <div class="col text-white" id="estado">
+                Toca empezar para jugar
+            </div>
+            <div class="col text-white" id="ronda">
+                Ronda:
+            </div>
+            <div class="col">
+                <button type="button" id="start" class="btn btn-primary">Empezar</button>
+            </div>
+        </div>
+        <div class="container mt-5" id="tablero">
+            <div class="row row-cols-2 cuadros">
+                <div class="cuadro" id="rojo"></div>
+                <div class="cuadro" id="azul"></div>
+            </div>
+            <div class="row row-cols-2 cuadros">
+                <div class="cuadro" id="amarillo"></div>
+                <div class="cuadro" id="verde"></div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            document.querySelector(`button[type=button]`).onclick = comenzarJuego
+
+            let rondas = 0;
+            let secuenciaUsuario = [];
+            let secuenciaMaquina = [];
+
+            function comenzarJuego() {
+                console.log("juego comenzado");
+                reiniciarEstado();
+                bloquearUsuario();
+                manejarRonda();
+            };
+
+            function reiniciarEstado() {
+                secuenciaUsuario = [];
+                secuenciaMaquina = [];
+                rondas = 0;
+            }
+
+            function usuario(e) {
+                const cuadro = e.target;
+                resaltarColor(cuadro);
+                secuenciaUsuario.push(cuadro);
+                
+                const cuadroMaquina = (secuenciaMaquina[secuenciaUsuario.length - 1])
+                if(cuadro.id !== cuadroMaquina.id){
+                    perderPartida();
+                    return;
+                }
+                if(secuenciaUsuario.length === secuenciaMaquina.length){
+                    bloquearUsuario();
+                    setTimeout((manejarRonda), 1000)     
+                }
+            }
+
+            function resaltarColor(cuadro) {
+                let color = window.getComputedStyle(cuadro).backgroundColor;
+                cuadro.style.boxShadow = `0 0 20px 10px ${color}`;
+                setTimeout(() => {  
+                    cuadro.style.boxShadow = "none";
+                }, 300);
+            }
+
+            function permisosUsuario() {
+                document.querySelectorAll(`.cuadro`).forEach(function (cuadro) {
+                    cuadro.onclick = usuario;
+                })
+            }
+
+            function manejarRonda() {
+                actualizarEstado("Recuerda el orden de los colores");
+                const nuevoCuadro = obtenerCuadroAleatorio();
+                secuenciaMaquina.push(nuevoCuadro);
+                const retrasoJugador = (secuenciaMaquina.length + 1) * 1000;
+                secuenciaMaquina.forEach(function (cuadro, index) {
+                    const retraso = (index + 1) * 1000;
+                    setTimeout(function () {
+                        resaltarColor(cuadro);
+                    }, retraso)
+                })
+
+                setTimeout(function () {
+                    actualizarEstado("Es tu turno")
+                    desbloquearUsuario();
+                }, retrasoJugador)
+
+                secuenciaUsuario = [];
+                rondas++;
+                actualizarRonda(rondas);
+            }
+            function obtenerCuadroAleatorio() {
+                const cuadros = document.querySelectorAll(`.cuadro`);
+                const indice = Math.floor(Math.random() * cuadros.length);
+                return cuadros[indice];
+            }
+
+            function actualizarRonda(rondas) {
+                document.querySelector(`#ronda`).innerText = `Ronda: ${rondas}`
+            }
+
+            function actualizarEstado(text) {
+                document.querySelector(`#estado`).innerText = text
+            }
+
+            function bloquearUsuario() {
+                document.querySelectorAll(`.cuadro`).forEach(function (cuadro) {
+                    cuadro.onclick = function () { }
+                })
+            }
+            function desbloquearUsuario() {
+                document.querySelectorAll(`.cuadro`).forEach(function (cuadro) {
+                    cuadro.onclick = usuario;
+                })
+            }
+
+            function perderPartida() {
+                actualizarEstado("¡Has perdido!😢 Haz clic en 'Empezar' para jugar de nuevo. 👉");
+                bloquearUsuario();
+                reiniciarEstado(); 
+            }
+
+        </script>
+</body>
+
+</html>
